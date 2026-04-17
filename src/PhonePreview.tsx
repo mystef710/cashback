@@ -26,6 +26,7 @@ interface PhonePreviewProps {
   turnover: TurnoverTable;
   schedule: { weekly: string; monthly: string };
   resetTimes: { daily: string; weekly: string; monthly: string };
+  instantFreq: string;
 }
 
 const BASE_AMOUNTS = { puzzle: 1000, pvp: 500, other: 2300 };
@@ -49,7 +50,7 @@ function formatTime(ms: number) {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes }: PhonePreviewProps) {
+export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq }: PhonePreviewProps) {
   const [flash, setFlash] = useState(false);
   const [effects, setEffects] = useState<{ id: number; type: string; txt: string }[]>([]);
   
@@ -95,7 +96,11 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
   const getNextReset = (type: string, lastTime: number | null) => {
     if (!lastTime) return 0;
     
-    if (type === 'instant') return lastTime + 2 * 60 * 1000;
+    if (type === 'instant') {
+      const freqHours = parseFloat(instantFreq);
+      const ms = (isNaN(freqHours) ? 0.25 : freqHours) * 60 * 60 * 1000;
+      return lastTime + ms;
+    }
     
     const timeStr = resetTimes[type as keyof typeof resetTimes];
     const [h = 0, m = 0, s = 0] = timeStr ? timeStr.split(':').map(Number) : [0, 0, 0];

@@ -31,6 +31,10 @@ export default function App() {
   const [saveCount, setSaveCount] = useState(0);
   const [phoneResetCount, setPhoneResetCount] = useState(0);
   const [timeErrors, setTimeErrors] = useState({ daily: false, weekly: false, monthly: false });
+  const [draftInstantFreq, setDraftInstantFreq] = useState("0.25");
+  const [savedInstantFreq, setSavedInstantFreq] = useState("0.25");
+  const [draftInstantMinClaim, setDraftInstantMinClaim] = useState("0.01");
+  const [savedInstantMinClaim, setSavedInstantMinClaim] = useState("0.01");
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
@@ -52,9 +56,24 @@ export default function App() {
       alert("Please fix invalid time formats (HH:MM:SS) before saving.");
       return;
     }
+    
+    const minClaim = parseFloat(draftInstantMinClaim);
+    if (isNaN(minClaim) || minClaim < 0.01) {
+      alert("Minimum Claim for Instant must be at least 0.01.");
+      return;
+    }
+    
+    const freq = parseFloat(draftInstantFreq);
+    if (isNaN(freq) || freq < 0.25) {
+      alert("Claim Reset Frequency for Instant must be at least 0.25 hours.");
+      return;
+    }
+
     setSavedTurnover(draftTurnover);
     setSavedSchedule(draftSchedule);
     setSavedResetTimes(draftResetTimes);
+    setSavedInstantFreq(draftInstantFreq);
+    setSavedInstantMinClaim(draftInstantMinClaim);
     setSaveCount(c => c + 1);
     setShowToast(true);
   };
@@ -63,6 +82,8 @@ export default function App() {
     setDraftTurnover(DEFAULT_TURNOVER);
     setDraftSchedule(DEFAULT_SCHEDULE);
     setDraftResetTimes(DEFAULT_RESET_TIMES);
+    setDraftInstantFreq("0.25");
+    setDraftInstantMinClaim("0.01");
     setTimeErrors({ daily: false, weekly: false, monthly: false });
     setVisibilities(DEFAULT_VISIBILITY);
   };
@@ -135,8 +156,14 @@ export default function App() {
                       <td className="py-6 px-4 font-medium text-slate-700">Instant</td>
                       <td className="py-6 px-4">
                         <div className="flex flex-col items-center">
-                          <div className="flex items-center border border-slate-200 rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 bg-white">
-                            <input type="text" defaultValue="0.01" className="w-20 px-3 py-2 text-center outline-none" />
+                          <div className={`flex items-center border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 bg-white ${parseFloat(draftInstantMinClaim) < 0.01 || isNaN(parseFloat(draftInstantMinClaim)) ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`}>
+                            <input 
+                              type="number" 
+                              step="0.01"
+                              value={draftInstantMinClaim} 
+                              onChange={e => setDraftInstantMinClaim(e.target.value)} 
+                              className={`w-20 px-3 py-2 text-center outline-none ${parseFloat(draftInstantMinClaim) < 0.01 || isNaN(parseFloat(draftInstantMinClaim)) ? 'text-red-500' : ''}`} 
+                            />
                             <span className="bg-white px-3 py-2 text-slate-500 border-l border-slate-200">Credit(s)</span>
                           </div>
                           <span className="text-xs text-slate-400 mt-2">Minimum 0.01 credit</span>
@@ -144,8 +171,14 @@ export default function App() {
                       </td>
                       <td className="py-6 px-4">
                         <div className="flex flex-col items-center">
-                          <div className="flex items-center border border-slate-200 rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 bg-white">
-                            <input type="text" defaultValue="0.25" className="w-20 px-3 py-2 text-center outline-none" />
+                          <div className={`flex items-center border rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 bg-white ${parseFloat(draftInstantFreq) < 0.25 || isNaN(parseFloat(draftInstantFreq)) ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`}>
+                            <input 
+                              type="number" 
+                              step="0.01"
+                              value={draftInstantFreq} 
+                              onChange={e => setDraftInstantFreq(e.target.value)} 
+                              className={`w-20 px-3 py-2 text-center outline-none ${parseFloat(draftInstantFreq) < 0.25 || isNaN(parseFloat(draftInstantFreq)) ? 'text-red-500' : ''}`} 
+                            />
                             <span className="bg-white px-3 py-2 text-slate-500 border-l border-slate-200">Hours</span>
                           </div>
                           <span className="text-xs text-slate-400 mt-2">Minimum 0.25 hours</span>
@@ -407,7 +440,15 @@ export default function App() {
       {/* Phone Screen Simulator */}
       <div className="hidden xl:flex shrink-0 relative mt-[24px] flex-col items-center">
         {/* Adds a slight visual alignment offset if needed */}
-        <PhonePreview visibility={visibilities} saveCount={saveCount} turnover={savedTurnover} schedule={savedSchedule} resetTimes={savedResetTimes} phoneResetCount={phoneResetCount} />
+        <PhonePreview 
+          visibility={visibilities} 
+          saveCount={saveCount} 
+          turnover={savedTurnover} 
+          schedule={savedSchedule} 
+          resetTimes={savedResetTimes} 
+          phoneResetCount={phoneResetCount} 
+          instantFreq={savedInstantFreq}
+        />
         
         <div className="mt-8 text-center">
           <button 
