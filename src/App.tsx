@@ -36,6 +36,9 @@ export default function App() {
   const [draftInstantMinClaim, setDraftInstantMinClaim] = useState("0.01");
   const [savedInstantMinClaim, setSavedInstantMinClaim] = useState("0.01");
   const [showToast, setShowToast] = useState(false);
+  const [activeAdminTab, setActiveAdminTab] = useState<'settings' | 'how-to-earn'>('settings');
+  const [draftHowToEarn, setDraftHowToEarn] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nHere's how to earn cashback:\n- Play puzzle games\n- Compete in PVP matches\n- Try other games");
+  const [savedHowToEarn, setSavedHowToEarn] = useState(draftHowToEarn);
 
   useEffect(() => {
     if (showToast) {
@@ -74,6 +77,7 @@ export default function App() {
     setSavedResetTimes(draftResetTimes);
     setSavedInstantFreq(draftInstantFreq);
     setSavedInstantMinClaim(draftInstantMinClaim);
+    setSavedHowToEarn(draftHowToEarn);
     setSaveCount(c => c + 1);
     setShowToast(true);
   };
@@ -113,7 +117,7 @@ export default function App() {
           </AnimatePresence>
 
           {/* Header */}
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl w-full mx-auto">
         <div className="flex items-center text-sm text-blue-500 mb-6">
           <LayoutGrid className="w-4 h-4 mr-2" />
           <span className="hover:underline cursor-pointer font-medium">Promotions</span>
@@ -123,18 +127,26 @@ export default function App() {
 
         {/* Tabs */}
         <div className="flex space-x-6 border-b border-slate-200 mb-6">
-          <button className="pb-3 text-blue-500 border-b-2 border-blue-500 font-medium text-sm">
+          <button 
+            onClick={() => setActiveAdminTab('settings')}
+            className={`pb-3 font-medium text-sm transition-colors ${activeAdminTab === 'settings' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-700'}`}
+          >
             Settings
           </button>
-          <button className="pb-3 text-slate-500 hover:text-slate-700 font-medium text-sm">
+          <button 
+            onClick={() => setActiveAdminTab('how-to-earn')}
+            className={`pb-3 font-medium text-sm transition-colors ${activeAdminTab === 'how-to-earn' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-700'}`}
+          >
             How to Earn Instructions
           </button>
         </div>
 
         {/* Main Content Grid */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Column */}
-          <div className="flex-1 space-y-6">
+          {activeAdminTab === 'settings' ? (
+            <>
+              {/* Left Column */}
+              <div className="flex-1 space-y-6">
             {/* General Settings Card */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-lg font-semibold text-slate-900">General Settings</h2>
@@ -426,6 +438,38 @@ export default function App() {
               </div>
             </div>
           </div>
+        </>
+        ) : (
+          <>
+            <div className="flex-1 space-y-6">
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Edit Instructions</h2>
+                <textarea 
+                  value={draftHowToEarn}
+                  onChange={(e) => setDraftHowToEarn(e.target.value)}
+                  className="w-full h-80 p-4 border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50 text-slate-700 resize-none font-sans"
+                  placeholder="Enter how to earn instructions here..."
+                />
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button 
+                    onClick={() => setDraftHowToEarn(savedHowToEarn)}
+                    className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSave} 
+                    className="px-5 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+            {/* Blank matching right column to keep layout constrained */}
+            <div className="hidden lg:block lg:w-72"></div>
+          </>
+        )}
         </div>
       </div>
       </div>
@@ -450,6 +494,7 @@ export default function App() {
           resetTimes={savedResetTimes} 
           phoneResetCount={phoneResetCount} 
           instantFreq={savedInstantFreq}
+          howToEarnText={savedHowToEarn}
         />
         
         <div className="mt-4 text-center shrink-0">

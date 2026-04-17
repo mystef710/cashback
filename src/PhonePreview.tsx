@@ -27,6 +27,7 @@ interface PhonePreviewProps {
   schedule: { weekly: string; monthly: string };
   resetTimes: { daily: string; weekly: string; monthly: string };
   instantFreq: string;
+  howToEarnText: string;
 }
 
 const BASE_AMOUNTS = { puzzle: 1000, pvp: 500, other: 2300 };
@@ -50,9 +51,10 @@ function formatTime(ms: number) {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq }: PhonePreviewProps) {
+export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq, howToEarnText }: PhonePreviewProps) {
   const [flash, setFlash] = useState(false);
   const [effects, setEffects] = useState<{ id: number; type: string; txt: string }[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'how-to-earn'>('overview');
   
   const [lastClaim, setLastClaim] = useState<{ [key: string]: number | null }>({
     instant: null, daily: null, weekly: null, monthly: null
@@ -243,12 +245,18 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
 
       {/* Tabs */}
       <div className="flex border-b border-gray-800">
-        <div className="flex-1 text-center py-3 border-b-2 border-red-500 text-white font-medium text-sm">
+        <button 
+          onClick={() => setActiveTab('overview')}
+          className={`flex-1 text-center py-3 font-medium text-sm transition-colors ${activeTab === 'overview' ? 'border-b-2 border-red-500 text-white' : 'text-gray-400'}`}
+        >
           Overview
-        </div>
-        <div className="flex-1 text-center py-3 text-gray-400 font-medium text-sm">
+        </button>
+        <button 
+          onClick={() => setActiveTab('how-to-earn')}
+          className={`flex-1 text-center py-3 font-medium text-sm transition-colors ${activeTab === 'how-to-earn' ? 'border-b-2 border-red-500 text-white' : 'text-gray-400'}`}
+        >
           How to Earn
-        </div>
+        </button>
       </div>
 
       {/* Main Content */}
@@ -257,18 +265,26 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
         animate={{ scale: flash ? 1.02 : 1, filter: flash ? "brightness(1.5)" : "brightness(1)", opacity: flash ? 0.9 : 1 }}
         transition={{ duration: 0.15 }}
       >
-        <div className="text-center mb-6">
-          <h2 className="text-lg font-bold drop-shadow-sm text-white">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-orange-400">Claim your reward below</span> 🎉
-          </h2>
-        </div>
+        {activeTab === 'overview' ? (
+          <>
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-bold drop-shadow-sm text-white">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-orange-400">Claim your reward below</span> 🎉
+              </h2>
+            </div>
 
-        <div className="grid grid-cols-2 gap-4 pb-6">
-          {visibility.instant && renderCard('instant', 'Instant')}
-          {visibility.daily && renderCard('daily', 'Daily')}
-          {visibility.weekly && renderCard('weekly', 'Weekly')}
-          {visibility.monthly && renderCard('monthly', 'Monthly')}
-        </div>
+            <div className="grid grid-cols-2 gap-4 pb-6">
+              {visibility.instant && renderCard('instant', 'Instant')}
+              {visibility.daily && renderCard('daily', 'Daily')}
+              {visibility.weekly && renderCard('weekly', 'Weekly')}
+              {visibility.monthly && renderCard('monthly', 'Monthly')}
+            </div>
+          </>
+        ) : (
+          <div className="text-white text-sm whitespace-pre-wrap leading-relaxed pb-6 text-left opacity-90">
+            {howToEarnText}
+          </div>
+        )}
       </motion.div>
       
       {/* Home Indicator */}
