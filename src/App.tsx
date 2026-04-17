@@ -93,10 +93,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4 lg:p-8 gap-8 overflow-hidden">
+    <div className="h-screen w-full bg-neutral-900 flex items-center justify-center p-4 lg:p-6 gap-6 xl:gap-8 overflow-hidden">
       {/* Computer Screen Wrapper */}
-      <div className="flex flex-col flex-1 shrink-0 max-w-5xl relative">
-        <div className="w-full h-[800px] bg-slate-100 text-slate-800 font-sans p-4 md:p-8 rounded-2xl shadow-2xl border-[8px] lg:border-[12px] lg:border-gray-800 overflow-y-auto relative flex flex-col">
+      <div className="flex flex-col flex-1 min-w-0 h-full max-w-[1400px] justify-center py-2 lg:py-6">
+        <div className="w-full flex-1 min-h-0 max-h-[900px] bg-slate-100 text-slate-800 font-sans p-4 md:p-6 lg:p-8 rounded-2xl shadow-2xl border-[8px] lg:border-[12px] border-gray-800 overflow-y-auto relative flex flex-col">
           
           {/* Toast Notification */}
           <AnimatePresence>
@@ -160,6 +160,7 @@ export default function App() {
                             <input 
                               type="number" 
                               step="0.01"
+                              min="0.01"
                               value={draftInstantMinClaim} 
                               onChange={e => setDraftInstantMinClaim(e.target.value)} 
                               className={`w-20 px-3 py-2 text-center outline-none ${parseFloat(draftInstantMinClaim) < 0.01 || isNaN(parseFloat(draftInstantMinClaim)) ? 'text-red-500' : ''}`} 
@@ -175,6 +176,7 @@ export default function App() {
                             <input 
                               type="number" 
                               step="0.01"
+                              min="0.25"
                               value={draftInstantFreq} 
                               onChange={e => setDraftInstantFreq(e.target.value)} 
                               className={`w-20 px-3 py-2 text-center outline-none ${parseFloat(draftInstantFreq) < 0.25 || isNaN(parseFloat(draftInstantFreq)) ? 'text-red-500' : ''}`} 
@@ -427,7 +429,7 @@ export default function App() {
         </div>
       </div>
       </div>
-        <div className="mt-8 text-center">
+        <div className="mt-4 text-center shrink-0">
           <button 
             onClick={handleLaptopReset}
             className="px-6 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-white rounded-lg shadow-lg border border-slate-600 font-medium transition-colors text-sm"
@@ -438,7 +440,7 @@ export default function App() {
       </div>
 
       {/* Phone Screen Simulator */}
-      <div className="hidden xl:flex shrink-0 relative mt-[24px] flex-col items-center">
+      <div className="hidden xl:flex shrink-0 relative flex-col items-center h-full justify-center py-2 lg:py-6">
         {/* Adds a slight visual alignment offset if needed */}
         <PhonePreview 
           visibility={visibilities} 
@@ -450,7 +452,7 @@ export default function App() {
           instantFreq={savedInstantFreq}
         />
         
-        <div className="mt-8 text-center">
+        <div className="mt-4 text-center shrink-0">
           <button 
             onClick={handlePhoneReset}
             className="px-6 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-white rounded-lg shadow-lg border border-slate-600 font-medium transition-colors text-sm"

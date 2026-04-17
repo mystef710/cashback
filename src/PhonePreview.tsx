@@ -225,7 +225,7 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
   };
 
   return (
-    <div className="w-[375px] h-[812px] bg-[#1a1111] rounded-[40px] overflow-hidden shadow-2xl border-[8px] border-black flex flex-col relative shrink-0">
+    <div className="w-[375px] h-full max-h-[812px] min-h-[500px] bg-[#1a1111] rounded-[40px] overflow-hidden shadow-2xl border-[8px] border-black flex flex-col relative shrink-0">
       
       {/* Top Bar */}
       <div className="px-6 pt-12 pb-4 flex items-center justify-between z-10 relative">
