@@ -178,7 +178,7 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
         {/* Subtle gradient to ease the contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/30 pointer-events-none" />
 
-        <h3 className="text-white font-bold text-lg z-10 pt-4 drop-shadow-md tracking-wider uppercase text-center w-full">{title}</h3>
+        <h3 className="text-white font-bold text-lg z-10 pt-4 drop-shadow-md tracking-wider text-center w-full">{title}</h3>
         
         <div className="flex-1 flex items-center justify-center relative w-full mt-2 z-10">
           <div className="absolute bottom-4 font-black text-3xl text-yellow-400 drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">
@@ -210,9 +210,9 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
             </button>
           ) : (
             <div className="w-full pb-1">
-              <p className="text-[10px] font-bold text-[#807bf1] mb-1.5 tracking-wider uppercase drop-shadow">CLAIM SOON!</p>
+              <p className="text-[10px] font-bold text-[#c22519] mb-1.5 tracking-wider uppercase drop-shadow">CLAIM SOON!</p>
               <div className="h-4 bg-[#1a0a0a]/80 backdrop-blur-md rounded-full overflow-hidden w-full relative border border-[#5a3a3a]">
-                <div className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#615ae2] to-[#807bf1] transition-all duration-1000" style={{ width: `${Math.max(5, (timeLeft / (nextReset - lastClaim[type]!)) * 100)}%`}} />
+                <div className="absolute left-0 top-0 bottom-0 bg-[#c22519] transition-all duration-1000" style={{ width: `${Math.max(5, (timeLeft / (nextReset - lastClaim[type]!)) * 100)}%`}} />
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-sm drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)] z-10">
                   {formatTime(timeLeft)}
                 </span>
