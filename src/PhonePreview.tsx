@@ -28,6 +28,7 @@ interface PhonePreviewProps {
   resetTimes: { daily: string; weekly: string; monthly: string };
   instantFreq: string;
   howToEarnText: string;
+  addedWallet: { puzzle: number; pvp: number; other: number };
 }
 
 const BASE_AMOUNTS = { puzzle: 1000, pvp: 500, other: 2300 };
@@ -51,13 +52,20 @@ function formatTime(ms: number) {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq, howToEarnText }: PhonePreviewProps) {
+export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq, howToEarnText, addedWallet }: PhonePreviewProps) {
   const [flash, setFlash] = useState(false);
   const [effects, setEffects] = useState<{ id: number; type: string; txt: string }[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'how-to-earn'>('overview');
   
   const [lastClaim, setLastClaim] = useState<{ [key: string]: number | null }>({
     instant: null, daily: null, weekly: null, monthly: null
+  });
+
+  const [claimedWalletAt, setClaimedWalletAt] = useState<{ [key: string]: { puzzle: number; pvp: number; other: number } }>({
+    instant: { puzzle: 0, pvp: 0, other: 0 },
+    daily: { puzzle: 0, pvp: 0, other: 0 },
+    weekly: { puzzle: 0, pvp: 0, other: 0 },
+    monthly: { puzzle: 0, pvp: 0, other: 0 }
   });
   
   const [now, setNow] = useState(Date.now());
@@ -82,11 +90,18 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
   useEffect(() => {
     if (phoneResetCount > 0) {
       setLastClaim({ instant: null, daily: null, weekly: null, monthly: null });
+      setClaimedWalletAt({
+        instant: { puzzle: 0, pvp: 0, other: 0 },
+        daily: { puzzle: 0, pvp: 0, other: 0 },
+        weekly: { puzzle: 0, pvp: 0, other: 0 },
+        monthly: { puzzle: 0, pvp: 0, other: 0 }
+      });
     }
   }, [phoneResetCount]);
 
   const handleClaim = (type: string, amount: string) => {
     setLastClaim(prev => ({ ...prev, [type]: Date.now() }));
+    setClaimedWalletAt(prev => ({ ...prev, [type]: { ...addedWallet } }));
     
     const effectId = Date.now();
     setEffects(prev => [...prev, { id: effectId, type, txt: `+$${amount}` }]);
@@ -143,16 +158,27 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
     return 0;
   };
 
-  const calcAmount = (level: TurnoverLevel) => 
+  const calcAddedAmount = (level: TurnoverLevel, type: string) => {
+    const puz = Math.max(0, addedWallet.puzzle - (claimedWalletAt[type]?.puzzle || 0));
+    const pvp = Math.max(0, addedWallet.pvp - (claimedWalletAt[type]?.pvp || 0));
+    const oth = Math.max(0, addedWallet.other - (claimedWalletAt[type]?.other || 0));
+
+    return (parseFloat(level.puzzle) || 0)/100 * puz + 
+           (parseFloat(level.pvp) || 0)/100 * pvp + 
+           (parseFloat(level.other) || 0)/100 * oth;
+  };
+
+  const calcAmount = (level: TurnoverLevel, type: string) => 
     (parseFloat(level.puzzle) || 0)/100 * BASE_AMOUNTS.puzzle + 
     (parseFloat(level.pvp) || 0)/100 * BASE_AMOUNTS.pvp + 
-    (parseFloat(level.other) || 0)/100 * BASE_AMOUNTS.other;
+    (parseFloat(level.other) || 0)/100 * BASE_AMOUNTS.other + 
+    calcAddedAmount(level, type);
 
   const amounts = {
-    instant: calcAmount(turnover.instant).toFixed(2),
-    daily: calcAmount(turnover.daily).toFixed(2),
-    weekly: calcAmount(turnover.weekly).toFixed(2),
-    monthly: calcAmount(turnover.monthly).toFixed(2),
+    instant: calcAmount(turnover.instant, 'instant').toFixed(2),
+    daily: calcAmount(turnover.daily, 'daily').toFixed(2),
+    weekly: calcAmount(turnover.weekly, 'weekly').toFixed(2),
+    monthly: calcAmount(turnover.monthly, 'monthly').toFixed(2),
   };
 
   const renderCard = (type: keyof typeof amounts, title: string) => {
@@ -162,10 +188,13 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
     
     // Auto reset if time passed
     if (isClaimed && timeLeft <= 0) {
-      setTimeout(() => setLastClaim(prev => ({ ...prev, [type]: null })), 0);
+      setTimeout(() => {
+        setLastClaim(prev => ({ ...prev, [type]: null }));
+        setClaimedWalletAt(prev => ({ ...prev, [type]: { puzzle: 0, pvp: 0, other: 0 } }));
+      }, 0);
     }
 
-    const currentAmount = isClaimed && timeLeft > 0 ? "0.00" : amounts[type];
+    const currentAmount = isClaimed && timeLeft > 0 ? calcAddedAmount(turnover[type as keyof TurnoverTable], type).toFixed(2) : amounts[type];
 
     return (
       <div className={`rounded-xl border border-[#4a2e2e] flex flex-col items-center justify-between relative overflow-hidden h-[240px]`}>

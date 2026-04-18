@@ -39,6 +39,9 @@ export default function App() {
   const [activeAdminTab, setActiveAdminTab] = useState<'settings' | 'how-to-earn'>('settings');
   const [draftHowToEarn, setDraftHowToEarn] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nHere's how to earn cashback:\n- Play puzzle games\n- Compete in PVP matches\n- Try other games");
   const [savedHowToEarn, setSavedHowToEarn] = useState(draftHowToEarn);
+  const [addedWallet, setAddedWallet] = useState({ puzzle: 0, pvp: 0, other: 0 });
+  const [purchaseInput, setPurchaseInput] = useState("");
+  const [purchaseType, setPurchaseType] = useState<'puzzle'|'pvp'|'other'>('puzzle');
 
   useEffect(() => {
     if (showToast) {
@@ -94,6 +97,16 @@ export default function App() {
 
   const handlePhoneReset = () => {
     setPhoneResetCount(c => c + 1);
+    setAddedWallet({ puzzle: 0, pvp: 0, other: 0 });
+    setPurchaseInput("");
+  };
+
+  const handleAddPurchase = () => {
+    const val = parseFloat(purchaseInput);
+    if (!isNaN(val) && val > 0) {
+      setAddedWallet(prev => ({ ...prev, [purchaseType]: prev[purchaseType] + val }));
+      setPurchaseInput("");
+    }
   };
 
   return (
@@ -495,12 +508,38 @@ export default function App() {
           phoneResetCount={phoneResetCount} 
           instantFreq={savedInstantFreq}
           howToEarnText={savedHowToEarn}
+          addedWallet={addedWallet}
         />
         
-        <div className="mt-4 text-center shrink-0">
+        <div className="mt-4 flex flex-col gap-3 shrink-0 w-full px-4">
+          <div className="flex gap-2 w-[375px] mx-auto">
+            <select 
+              value={purchaseType}
+              onChange={(e) => setPurchaseType(e.target.value as 'puzzle'|'pvp'|'other')}
+              className="px-3 py-2 rounded-lg bg-slate-800 text-white border border-slate-600 outline-none focus:ring-1 focus:ring-blue-500 text-sm w-28"
+            >
+              <option value="puzzle">PUZZLE</option>
+              <option value="pvp">PVP</option>
+              <option value="other">OTHER</option>
+            </select>
+            <input 
+              type="number"
+              placeholder="Amount"
+              value={purchaseInput}
+              onChange={(e) => setPurchaseInput(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg bg-slate-800 text-white border border-slate-600 outline-none focus:ring-1 focus:ring-blue-500 placeholder-slate-400 text-sm"
+              onKeyDown={(e) => e.key === 'Enter' && handleAddPurchase()}
+            />
+            <button 
+              onClick={handleAddPurchase}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-lg font-medium transition-colors text-sm shrink-0 whitespace-nowrap"
+            >
+              Add
+            </button>
+          </div>
           <button 
             onClick={handlePhoneReset}
-            className="px-6 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-white rounded-lg shadow-lg border border-slate-600 font-medium transition-colors text-sm"
+            className="w-[375px] mx-auto px-6 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-white rounded-lg shadow-lg border border-slate-600 font-medium transition-colors text-sm"
           >
             Reset Phone Values
           </button>
