@@ -27,6 +27,7 @@ interface PhonePreviewProps {
   schedule: { weekly: string; monthly: string };
   resetTimes: { daily: string; weekly: string; monthly: string };
   instantFreq: string;
+  instantMinClaim: string;
   howToEarnText: string;
   addedWallet: { puzzle: number; pvp: number; other: number };
 }
@@ -52,7 +53,7 @@ function formatTime(ms: number) {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq, howToEarnText, addedWallet }: PhonePreviewProps) {
+export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover, schedule, resetTimes, instantFreq, instantMinClaim, howToEarnText, addedWallet }: PhonePreviewProps) {
   const [flash, setFlash] = useState(false);
   const [effects, setEffects] = useState<{ id: number; type: string; txt: string }[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'how-to-earn'>('overview');
@@ -196,6 +197,9 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
 
     const currentAmount = isClaimed && timeLeft > 0 ? calcAddedAmount(turnover[type as keyof TurnoverTable], type).toFixed(2) : amounts[type];
 
+    // Check if Instant claim should be disabled because under minimum required
+    const isInstantDisabled = type === 'instant' && parseFloat(currentAmount) < parseFloat(instantMinClaim);
+
     return (
       <div className={`rounded-xl border border-[#4a2e2e] flex flex-col items-center justify-between relative overflow-hidden h-[240px]`}>
         {/* Background Image */}
@@ -235,7 +239,12 @@ export function PhonePreview({ visibility, saveCount, phoneResetCount, turnover,
           {(!isClaimed || timeLeft <= 0) ? (
             <button 
               onClick={() => handleClaim(type, amounts[type])}
-              className="w-full py-2.5 bg-gradient-to-b from-red-500 to-red-700 hover:from-red-400 hover:to-red-600 rounded-lg text-white font-bold text-sm shadow-[0_4px_14px_0_rgba(239,68,68,0.5)] border border-red-400/50 transition-all uppercase tracking-wide"
+              disabled={isInstantDisabled}
+              className={`w-full py-2.5 rounded-lg text-white font-bold text-sm transition-all uppercase tracking-wide border ${
+                isInstantDisabled 
+                  ? 'bg-slate-600 border-slate-500 opacity-50 cursor-not-allowed shadow-none' 
+                  : 'bg-gradient-to-b from-red-500 to-red-700 hover:from-red-400 hover:to-red-600 shadow-[0_4px_14px_0_rgba(239,68,68,0.5)] border-red-400/50'
+              }`}
             >
               Claim
             </button>

@@ -507,6 +507,7 @@ export default function App() {
           resetTimes={savedResetTimes} 
           phoneResetCount={phoneResetCount} 
           instantFreq={savedInstantFreq}
+          instantMinClaim={savedInstantMinClaim}
           howToEarnText={savedHowToEarn}
           addedWallet={addedWallet}
         />
