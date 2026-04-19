@@ -109,6 +109,18 @@ export default function App() {
     }
   };
 
+  const handleCancelGeneralSettings = () => {
+    setDraftSchedule(savedSchedule);
+    setDraftResetTimes(savedResetTimes);
+    setDraftInstantFreq(savedInstantFreq);
+    setDraftInstantMinClaim(savedInstantMinClaim);
+    setTimeErrors({ daily: false, weekly: false, monthly: false });
+  };
+
+  const handleCancelTurnover = () => {
+    setDraftTurnover(savedTurnover);
+  };
+
   return (
     <div className="h-screen w-full bg-neutral-900 flex items-center justify-center p-4 lg:p-6 gap-6 xl:gap-8 overflow-hidden">
       {/* Computer Screen Wrapper */}
@@ -296,7 +308,7 @@ export default function App() {
                 </table>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
-                <button className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors">Cancel</button>
+                <button onClick={handleCancelGeneralSettings} className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors">Cancel</button>
                 <button onClick={handleSave} className="px-5 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors">Save</button>
               </div>
             </div>
@@ -432,7 +444,7 @@ export default function App() {
                 </table>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
-                <button className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors">Cancel</button>
+                <button onClick={handleCancelTurnover} className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors">Cancel</button>
                 <button onClick={handleSave} className="px-5 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors">Save</button>
               </div>
             </div>
